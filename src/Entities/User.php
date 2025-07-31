@@ -53,6 +53,18 @@ class User
 	 */
 	protected $date_of_birth;
 
+	public static function createFromArray(array $data) : User {
+		return new User(
+			$data['client_user_id'],
+			$data['legal_name'],
+			$data['phone_number'],
+			$data['phone_number_verified_time'],
+			$data['email_address'],
+			$data['ssn'],
+			$data['date_of_birth']
+		);
+	}
+
 	public function __construct(
 		string $id,
 		?string $name = null,

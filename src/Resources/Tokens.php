@@ -2,16 +2,20 @@
 
 namespace TomorrowIdeas\Plaid\Resources;
 
+use TomorrowIdeas\Plaid\Entities\TokenConfig\AccountFilters;
+use TomorrowIdeas\Plaid\Entities\TokenConfig\AuthConfig;
+use TomorrowIdeas\Plaid\Entities\TokenConfig\PaymentInitiationConfig;
+use TomorrowIdeas\Plaid\Entities\TokenConfig\TokenConfig;
 use TomorrowIdeas\Plaid\Entities\User;
 use TomorrowIdeas\Plaid\PlaidRequestException;
-use TomorrowIdeas\Plaid\Entities\AccountFilters;
 
 class Tokens extends AbstractResource
 {
 	/**
 	 * Create a Link Token.
 	 *
-	 * @param string $client_name
+	 * @param \TomorrowIdeas\Plaid\Entities\TokenConfig\TokenConfig|string $token_config
+	 *   The token config or `client_name` if using the deprecated approach.
 	 * @param string $language Possible values are: en, fr, es, nl
 	 * @param array<string> $country_codes Possible values are: CA, FR, IE, NL, ES, GB, US
 	 * @param User $user
@@ -25,14 +29,18 @@ class Tokens extends AbstractResource
 	 * @param string|null $payment_id
 	 * @param string|null $institution_id
 	 * @param array|null $auth
+	 *
 	 * @throws PlaidRequestException
+	 * @throws \InvalidArgumentException
+	 *   When calling with $token_config as a string for the client name, if language and country_codes are
+	 *
 	 * @return object
 	 */
 	public function create(
-		string $client_name,
-		string $language,
-		array $country_codes,
-		User $user,
+		$token_config,
+		?string $language = NULL,
+		?array $country_codes = NULL,
+		?User $user = NULL,
 		array $products = [],
 		?string $webhook = null,
 		?string $link_customization_name = null,
@@ -44,56 +52,37 @@ class Tokens extends AbstractResource
 		?string $institution_id = null,
 		?array $auth = null): object {
 
-		$params = [
-			"client_name" => $client_name,
-			"language" => $language,
-			"country_codes" => $country_codes,
-			"user" => $user->toArray(),
-			"products" => $products
-		];
+		if (is_string($token_config)) {
+			trigger_error('Passing multiple arguments to Tokens::create() is deprecated. Please pass an instance of TomorrowIdeas\Plaid\Entities\TokenConfig\TokenConfig instead.', E_USER_DEPRECATED);
 
-		if( $webhook ){
-			$params["webhook"] = $webhook;
-		}
+			if (empty($language) || empty($country_codes)) {
+				throw new \InvalidArgumentException('You must provide a language and country code when passing a string as the first argument to Tokens::create().');
+			}
 
-		if( $link_customization_name ){
-			$params["link_customization_name"] = $link_customization_name;
-		}
-
-		if( $account_filters ){
-			$params["account_filters"] = $account_filters->toArray();
-		}
-
-		if( $access_token ){
-			$params["access_token"] = $access_token;
-		}
-
-		if( $redirect_uri ){
-			$params["redirect_uri"] = $redirect_uri;
-		}
-
-		if( $android_package_name ){
-			$params["android_package_name"] = $android_package_name;
-		}
-
-		if( $payment_id ){
-			$params["payment_initiation"] = [
-				"payment_id" => $payment_id
-			];
-		}
-
-		if( $institution_id ){
-			$params["institution_id"] = $institution_id;
-		}
-
-		if ($auth) {
-			$params["auth"] = $auth;
+			$token_config = (new TokenConfig(
+					$token_config,
+					$language,
+					$country_codes,
+				))
+			    ->setUser($user)
+			    ->setProducts($products)
+			    ->setWebhook($webhook)
+			    ->setLinkCustomizationName($link_customization_name)
+			    ->setAccountFilters($account_filters)
+			    ->setAccessToken($access_token)
+			    ->setRedirectUri($redirect_uri)
+			    ->setAndroidPackageName($android_package_name)
+			    ->setInstitutionId($institution_id)
+			    ->setAuth(AuthConfig::createFromArray($auth));
+			if ($payment_id) {
+				$token_config->setPaymentInitiation((new PaymentInitiationConfig())->setPaymentId($payment_id));;
+			}
 		}
 
 		return $this->sendRequest(
 			"post",
 			"link/token/create",
-			$this->paramsWithClientCredentials($params)
+			$this->paramsWithClientCredentials($token_config->toArray())
 		);
 	}
 

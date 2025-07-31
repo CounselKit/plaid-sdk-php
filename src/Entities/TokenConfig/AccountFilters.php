@@ -1,6 +1,6 @@
 <?php
 
-namespace TomorrowIdeas\Plaid\Entities;
+namespace TomorrowIdeas\Plaid\Entities\TokenConfig;
 
 class AccountFilters
 {
@@ -10,6 +10,18 @@ class AccountFilters
 	 * @var array<string,array<string,array<string>>>
 	 */
 	protected $filters = [];
+
+	/**
+	 * Create account filters from and array.
+	 *
+	 * @param array $filters
+	 *
+	 * @return \TomorrowIdeas\Plaid\Entities\TokenConfig\AccountFilters
+	 */
+	public static function createFromArray(array $filters): self
+	{
+		return new self($filters);
+	}
 
 
 	/**
