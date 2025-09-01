@@ -38,4 +38,12 @@ class Credit extends AbstractResource
 		);
 	}
 
+	public function getSessions(string $user_token) : object {
+		return $this->sendRequest(
+			"post",
+			"credit/sessions/get",
+			$this->paramsWithClientCredentials(['user_token' => $user_token])
+		);
+	}
+
 }

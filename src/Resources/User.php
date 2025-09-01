@@ -43,7 +43,7 @@ class User extends AbstractResource
 	public function getItems(string $user_token) : array {
 		$response = $this->sendRequest(
 			"post",
-			"user/remove",
+			"user/items/get",
 			$this->paramsWithClientCredentials([
 				'user_token' => $user_token
 			])
