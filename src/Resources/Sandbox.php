@@ -18,13 +18,15 @@ class Sandbox extends AbstractResource
 	public function createPublicToken(
 		string $institution_id,
 		array $initial_products,
-		array $options = []): object
+		array $options = [],
+	    ?string $user_token = NULL): object
 	{
-		$params = [
+		$params = array_filter([
 			"institution_id" => $institution_id,
 			"initial_products" => $initial_products,
+			"user_token" => $user_token,
 			"options" => (object) $options
-		];
+		]);
 
 		return $this->sendRequest(
 			"post",
