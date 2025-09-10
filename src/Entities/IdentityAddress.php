@@ -41,6 +41,23 @@ class IdentityAddress
 	protected $country;
 
 	/**
+	 * Create an IdentityAddress object from an array.
+	 *
+	 * @param array $data
+	 *
+	 * @return \TomorrowIdeas\Plaid\Entities\IdentityAddress
+	 */
+	public static function createFromArray(array $data) : IdentityAddress {
+		return new static(
+			$data['street'],
+			$data['city'],
+			$data['region'],
+			$data['postal_code'],
+			$data['country']
+		);
+	}
+
+	/**
 	 * Address constructor.
 	 *
 	 * The Address object is needed for certain requests to Plaid.

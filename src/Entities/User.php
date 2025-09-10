@@ -7,7 +7,7 @@ class User
 	/**
 	 * User ID
 	 *
-	 * @var string
+	 * @var string|null
 	 */
 	protected $id;
 
@@ -53,6 +53,13 @@ class User
 	 */
 	protected $date_of_birth;
 
+	/**
+	 * User address.
+	 *
+	 * @var IdentityAddress|null
+	 */
+	protected $address;
+
 	public static function createFromArray(array $data) : User {
 		return new User(
 			$data['client_user_id'],
@@ -61,18 +68,20 @@ class User
 			$data['phone_number_verified_time'],
 			$data['email_address'],
 			$data['ssn'],
-			$data['date_of_birth']
+			$data['date_of_birth'],
+			!empty($data['address']) ? ($data['address'] instanceof IdentityAddress ? $data['address'] : IdentityAddress::createFromArray($data['address'])) : null
 		);
 	}
 
 	public function __construct(
-		string $id,
+		?string $id = null,
 		?string $name = null,
 		?string $phone_number = null,
 		?string $phone_number_verified_time = null,
 		?string $email_address = null,
 		?string $ssn = null,
-		?string $date_of_birth = null
+		?string $date_of_birth = null,
+		?IdentityAddress $address = null
 	)
 	{
 		$this->id = $id;
@@ -82,6 +91,7 @@ class User
 		$this->email_address = $email_address;
 		$this->ssn = $ssn;
 		$this->date_of_birth = $date_of_birth;
+		$this->address = $address;
 	}
 
 	public function toArray(): array
@@ -94,7 +104,8 @@ class User
 				"phone_number_verified_time" => $this->phone_number_verified_time,
 				"email_address" => $this->email_address,
 				"ssn" => $this->ssn,
-				"date_of_birth" => $this->date_of_birth
+				"date_of_birth" => $this->date_of_birth,
+				"address" => $this->address ? $this->address->toArray() : null
 			],
 			function($value): bool {
 				return $value !== null;

@@ -2,6 +2,7 @@
 
 namespace TomorrowIdeas\Plaid\Resources;
 
+use TomorrowIdeas\Plaid\Entities\User;
 use TomorrowIdeas\Plaid\PlaidRequestException;
 
 class Accounts extends AbstractResource
@@ -68,6 +69,31 @@ class Accounts extends AbstractResource
 		return $this->sendRequest(
 			"post",
 			"identity/get",
+			$this->paramsWithClientCredentials($params)
+		);
+	}
+
+	/**
+	 * Match accounts to given user.
+	 *
+	 * @param string $access_token
+	 * @param \TomorrowIdeas\Plaid\Entities\User $user
+	 * @param array $options
+	 *
+	 * @return object
+	 * @throws \TomorrowIdeas\Plaid\PlaidRequestException
+	 */
+	public function matchIdentity(string $access_token, User $user, array $options = []): object
+	{
+		$params = [
+			"access_token" => $access_token,
+			"user" => $user->toArray(),
+			"options" => (object) $options
+		];
+
+		return $this->sendRequest(
+			"post",
+			"identity/match",
 			$this->paramsWithClientCredentials($params)
 		);
 	}
