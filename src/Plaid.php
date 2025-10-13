@@ -21,6 +21,7 @@ use UnexpectedValueException;
  * @property \TomorrowIdeas\Plaid\Resources\Payments $payments
  * @property \TomorrowIdeas\Plaid\Resources\Processors $processors
  * @property \TomorrowIdeas\Plaid\Resources\Reports $reports
+ * @property \TomorrowIdeas\Plaid\Resources\Statements $statements
  * @property \TomorrowIdeas\Plaid\Resources\Sandbox $sandbox
  * @property \TomorrowIdeas\Plaid\Resources\Transactions $transactions
  * @property \TomorrowIdeas\Plaid\Resources\Webhooks $webhooks
